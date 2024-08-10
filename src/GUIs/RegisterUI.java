@@ -1,7 +1,13 @@
 package GUIs;
 
+import DBObjs.BankJDBC;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class RegisterUI extends BaseFrame{
 
@@ -98,6 +104,39 @@ public class RegisterUI extends BaseFrame{
         //To center it(more aesthetically pleasing to me personally)...
         registerButton.setHorizontalAlignment(SwingConstants.CENTER);
         //...and now to add it!!
+        registerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //Picks new username...
+                String username = usernameTextField.getText();
+                //Picks new password...
+                String password = String.valueOf(passwordTextField.getPassword());
+                //Picks repetition of password by user...
+                String confirmedPassword = String.valueOf(confirmedPasswordTextField.getPassword());
+                //Checking result of user input validation and moving accordingly...
+                if(userEntriesValidation(username,password,confirmedPassword)) {
+                    //Tries to put new user into DB, if it works...
+                    if(BankJDBC.registrationValidation(username,password)){
+                        //Means we can move so we can remove registration screen
+                        RegisterUI.this.dispose();
+                        LoginUI loginUI = new LoginUI("");
+                        loginUI.setVisible(true);
+                        JOptionPane.showMessageDialog(loginUI,"You've registered succesfully.\nNow you may login.");
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(RegisterUI.this,"Sorry, seems username is already taken!");
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(RegisterUI.this,
+                            "Please ensure that:\n" +
+                                    "1.Nothing is left blank\n" +
+                                    "2.Username is 6 characters long or more\n" +
+                                    "3. Both entries of desired password match\n" +
+                                    "So please try again, thank you.");
+                }
+            }
+        });
         add(registerButton);
 
         //For telling sb to login if they already have an account
@@ -109,6 +148,36 @@ public class RegisterUI extends BaseFrame{
         //Centers it...
         loginLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //...and below adds it else hatungeona lol.
+        loginLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                RegisterUI.this.dispose();
+                new LoginUI("").setVisible(true);
+            }
+        });
+        //Like with registration link, this takes you back to the login page if you
+        //had an account after all,
         add(loginLabel);
+    }
+
+    private  boolean userEntriesValidation(String username,String password, String confrimedPassword) {
+        //Checking if both entries of the password match and if not...
+        if(!(password.equals(confrimedPassword))) {
+            JOptionPane.showMessageDialog(RegisterUI.this,"Your password and your confirming it should match!\nTry again.");
+            return false;
+        }
+        //Checking sensiblilty of username...
+        if(username.length() < 6) {
+            JOptionPane.showMessageDialog(RegisterUI.this,"Please make sure username is at least 6 characters long! ");
+            return false;
+        }
+        //Checking that nothing is left empty...
+        if((username.length() == 0) || (password.length() == 0) || (confrimedPassword.length() == 0)) {
+            JOptionPane.showMessageDialog(RegisterUI.this,"Please put in values for ALL the slots!");
+            return false;
+        }
+
+        //Assumes it's successfully passed preceding conditions, hence true hapa.
+        return true;
     }
 }

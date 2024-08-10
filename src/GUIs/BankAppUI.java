@@ -4,8 +4,10 @@ import DBObjs.People;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class BankAppUI extends BaseFrame{
+public class BankAppUI extends BaseFrame implements ActionListener {
 
     private JTextField balanceTextField;
     public JTextField getCurrentBalanceField() {
@@ -83,7 +85,7 @@ public class BankAppUI extends BaseFrame{
 
         //For textfield where balance will be viewed and (carefully!) modified...
         balanceTextField = new JTextField();
-        //To set text, since it represents the balance...
+         //To set text, since it represents the balance...
         balanceTextField.setText("sh."+ personne.getBalance() );
         //To prevent sth that would be terrible irl...a user illegally adding themselves money!
         balanceTextField.setEditable(false);
@@ -114,9 +116,17 @@ public class BankAppUI extends BaseFrame{
          */
 
         JButton depositButton = new JButton("Deposit");
+        depositButton.setFont(new Font("Times New Roman",Font.PLAIN,20));
+        depositButton.addActionListener(this);
         JButton withdrawButton = new JButton("Withdraw");
+        withdrawButton.setFont(new Font("Times New Roman",Font.PLAIN,20));
+        withdrawButton.addActionListener(this);
         JButton historyButton = new JButton("Previous Transactions");
+        historyButton.setFont(new Font("Times New Roman",Font.PLAIN,20));
+        historyButton.addActionListener(this);
         JButton transferButton = new JButton("Transfer");
+        transferButton.setFont(new Font("Times New Roman",Font.PLAIN,20));
+        transferButton.addActionListener(this);
 
 
         /*
@@ -140,7 +150,38 @@ public class BankAppUI extends BaseFrame{
         logoutButton.setFont(new Font("Times New Roman",Font.BOLD,30));
         //To center it(more aesthetically pleasing to me personally)...
         logoutButton.setHorizontalAlignment(SwingConstants.CENTER);
+        //To make it functional...
+        logoutButton.addActionListener(this);
         //...and now to add it!!
         add(logoutButton);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String kubonyezwa = e.getActionCommand();
+        if(kubonyezwa.equalsIgnoreCase("logout")) {
+            this.dispose();
+            new LoginUI("").setVisible(true);
+            return;
+        }
+
+        BankAppDialogue bankAppDialogue = new BankAppDialogue(this, personne);
+
+
+        if(kubonyezwa.equalsIgnoreCase("Deposit" ) || kubonyezwa.equalsIgnoreCase("Withdraw") || kubonyezwa.equalsIgnoreCase("Transfer")) {
+            bankAppDialogue.updateCurrentBalanceAndAmount();
+            bankAppDialogue.addActionButton(kubonyezwa);
+
+            if(kubonyezwa.equalsIgnoreCase("Transfer")) {
+                bankAppDialogue.addUserField();
+            }
+
+
+        }
+        else if (kubonyezwa.equalsIgnoreCase("Previous Transactions") ) {
+                bankAppDialogue.showPastTransactions();
+
+        }
+        bankAppDialogue.setVisible(true);
     }
 }

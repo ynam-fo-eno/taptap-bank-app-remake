@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class LoginUI extends BaseFrame implements ActionListener {
 
@@ -111,6 +113,16 @@ public class LoginUI extends BaseFrame implements ActionListener {
         //Centers it...
         registerLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //...and below adds it else hatungeona lol.
+        registerLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                LoginUI.this.dispose();
+                //Removes the login UI...
+                new RegisterUI("").setVisible(true);
+                //...and shows registration screen.
+            }
+        });
+        //This overriden MouseListener method is what makes clicking the link functional.
         add(registerLabel);
     }
 
